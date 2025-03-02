@@ -77,7 +77,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         var cameraController = LifecycleCameraController(baseContext)
         val previewView: PreviewView = findViewById(R.id.preview_view);
@@ -116,59 +115,5 @@ class MainActivity : AppCompatActivity() {
 
         cameraController.bindToLifecycle(this)
         previewView.controller = cameraController
-    }
-
-    private class MyImageAnalyzer : ImageAnalysis.Analyzer {
-        @SuppressLint("RestrictedApi")
-        @ExperimentalGetImage
-        override fun analyze(imageProxy: ImageProxy) {
-            /* Create cv::mat(RGB888) from image(NV21) */
-//            Log.d(TAG, "analyze: " + image.getImageInfo().getRotationDegrees());
-            val mediaImage = imageProxy.image
-            Log.d(TAG, "analyze: ")
-            if (mediaImage != null) {
-
-                val image =
-                    InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-
-                val options = BarcodeScannerOptions.Builder()
-                    .setBarcodeFormats(
-                        Barcode.FORMAT_QR_CODE,
-                        Barcode.FORMAT_CODABAR)
-                    .build()
-
-                val scanner = BarcodeScanning.getClient(options)
-
-                val result = scanner.process(image)
-                    .addOnSuccessListener { barcodes ->
-                        for (barcode in barcodes) {
-                            val bounds = barcode.boundingBox
-                            val corners = barcode.cornerPoints
-
-                            val rawValue = barcode.rawValue
-
-                            Log.d(TAG, "analyze: $rawValue")
-
-                            val valueType = barcode.valueType
-                            // See API reference for complete list of supported types
-                            when (valueType) {
-                                Barcode.TYPE_WIFI -> {
-                                    val ssid = barcode.wifi!!.ssid
-                                    val password = barcode.wifi!!.password
-                                    val type = barcode.wifi!!.encryptionType
-                                }
-                                Barcode.TYPE_URL -> {
-                                    val title = barcode.url!!.title
-                                    val url = barcode.url!!.url
-                                }
-                            }
-                        }
-                    }
-                    .addOnFailureListener {
-                        // Task failed with an exception
-                        // ...
-                    }
-            }
-        }
     }
 }
