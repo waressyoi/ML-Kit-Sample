@@ -76,9 +76,10 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun startCamera() {
 
-        var cameraController = LifecycleCameraController(baseContext)
+        val cameraController = LifecycleCameraController(baseContext)
         val previewView: PreviewView = findViewById(R.id.preview_view);
 
         val options = BarcodeScannerOptions.Builder()
